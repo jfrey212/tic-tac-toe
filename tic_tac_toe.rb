@@ -1,18 +1,15 @@
+
 # Odin Project Tic Tac Toe Game
 # by Joseph Frey
 
 # The Game class has methods for starting and finishing the game, and records number of games played.
 
 class Game
-  attr_accessor :player1, :player2, :current_turn
-  attr_reader :name
-
-  @@game_count = 0
+  attr_accessor :player1, :player2, :current_turn, :turn_count, :board
 
   def initialize
-    @name = 'Tic-Tac-Toe'
-    @turn_count = 1
-    @@game_count += 1
+    self.turn_count = 0
+    self.board = Board.new
   end
 
   def name_players
@@ -21,16 +18,27 @@ class Game
     puts
     print 'Player 2 Enter Name: '
     @player2 = Player.new(gets.chomp)
-    puts [@player1, @player2]
-    self.current_turn = self.player1
   end
 
-  def player_move(board)
-    print "#{player1} pick a box: "
-    board.add_x(gets.chomp.to_sym)
+  def next_turn
+    system("clear")
+    puts current_turn
+    self.board.display
+    if self.current_turn == 0
+      print "#{player1.name} pick a box: "
+      board.add_x(gets.chomp.to_sym)
+      self.current_turn = 1
+    elsif self.current_turn == 1
+      print "#{player2.name} pick a box: "
+      board.add_o(gets.chomp.to_sym)
+      self.current_turn = 0
+    end
   end
 
-  def add_player_move; end
+  def start_game
+    name_players
+    self.current_turn = 0
+  end
 end
 
 # The board class draws the tic-tac-toe board and can add X or O to a cell in the board.
@@ -51,14 +59,14 @@ class Board
   end
 
   def display
-    puts '     a    b     c    '
-    puts " 1  #{@grid[:a1]}  |  #{@grid[:a2]}  |  #{@grid[:a3]} "
+    puts '     1    2     3    '
+    puts " a  #{@grid[:a1]}  |  #{@grid[:a2]}  |  #{@grid[:a3]} "
     print '   ----------------'
     puts
-    puts " 2  #{@grid[:b1]}  |  #{@grid[:b2]}  |  #{@grid[:b3]} "
+    puts " b  #{@grid[:b1]}  |  #{@grid[:b2]}  |  #{@grid[:b3]} "
     print '   ----------------'
     puts
-    puts " 3  #{@grid[:c1]}  |  #{@grid[:c2]}  | #{@grid[:c3]} "
+    puts " c  #{@grid[:c1]}  |  #{@grid[:c2]}  | #{@grid[:c3]} "
   end
 end
 
@@ -77,3 +85,7 @@ end
 class Turn
   def initialize; end
 end
+
+g = Game.new
+g.start_game
+g.next_turn
