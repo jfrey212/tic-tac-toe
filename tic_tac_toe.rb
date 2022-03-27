@@ -20,6 +20,9 @@ class Game
     puts
     print 'Player 2 Enter Name: '
     @player2 = Player.new(gets.chomp)
+
+    puts @player1.name
+    puts @player2.name
   end
 
   def next_turn
@@ -37,36 +40,36 @@ class Game
       @current_turn = 0
       @turn_count += 1
     end
+    system('clear')
+    @board.display
   end
 
   def victory_check
-    if @board.grid[:a1] == @board.grid[:a2] && @board.grid[:a2] == @board.grid[:a3]
-      @is_winner = true
-      @winner = @board.grid[:a1} == 'X' ? @player1 : @player2
-    elsif @board.grid[:b1] == @board.grid[:b2] && @board.grid[:b2] == @board.grid[:b3]
-      @is_winner = true
-      @winner = @board.grid[:b1} == 'X' ? @player1 : @player2
-    elsif @board.grid[:c1] == @board.grid[:c2] && @board.grid[:c2] == @board.grid[:c3]
-      @is_winner = true
-      @winner = @board.grid[:c1} == 'X' ? @player1 : @player2
-    elsif @board.grid[:a1] == @board.grid[:b1] && @board.grid[:b1] == @board.grid[:c1]
-      @is_winner = true
-      @winner = @board.grid[:a1} == 'X' ? @player1 : @player2
-    elsif @board.grid[:a2] == @board.grid[:b2] && @board.grid[:b2] == @board.grid[:c2]
-      @is_winner = true
-      @winner = @board.grid[:a2} == 'X' ? @player1 : @player2
-    elsif @board.grid[:a3] == @board.grid[:b3] && @board.grid[:b3] == @board.grid[:c3]
-      @is_winner = true
-      @winner = @board.grid[:a3} == 'X' ? @player1 : @player2
-    elsif @board.grid[:a1] == @board.grid[:b2] && @board.grid[:b2] == @board.grid[:c3]
-      @is_winner = true
-      @winner = @board.grid[:a1} == 'X' ? @player1 : @player2
-    elsif @board.grid[:a3] == @board.grid[:b2] && @board.grid[:b2] == @board.grid[:c1]
-      @is_winner = true
-      @winner = @board.grid[:a3} == 'X' ? @player1 : @player2
-    else
-      @is_winner = false
+    win1 = [@board.grid[:a1], @board.grid[:a2], @board.grid[:a3]]
+    win2 = [@board.grid[:b1], @board.grid[:b2], @board.grid[:b3]]
+    win3 = [@board.grid[:c1], @board.grid[:c2], @board.grid[:c3]]
+    win4 = [@board.grid[:a1], @board.grid[:b1], @board.grid[:c1]]
+    win5 = [@board.grid[:a2], @board.grid[:b2], @board.grid[:c2]]
+    win6 = [@board.grid[:a3], @board.grid[:b3], @board.grid[:c3]]
+    win7 = [@board.grid[:a1], @board.grid[:b2], @board.grid[:c3]]
+    win8 = [@board.grid[:c1], @board.grid[:b2], @board.grid[:a3]]
+
+    wins = [win1, win2, win3, win4, win5, win6, win7, win8]
+
+    wins.each do |check|
+      if check.uniq.length == 1 && check.uniq[0] == 'X'
+        @is_winner = true
+        @winner = 'player 1'
+        break
+      elsif check.uniq.length == 1 && check.uniq[0] == 'O'
+        @is_winner = true
+        @winner = 'player 2'
+        break
+      else
+        @winner = 'no winner yet'
+      end
     end
+
     puts @is_winner
     puts @winner
   end
@@ -76,6 +79,7 @@ end
 
 class Board
   attr_reader :grid
+
   def initialize
     @grid = { a1: ' ', a2: ' ', a3: ' ',
               b1: ' ', b2: ' ', b3: ' ',
@@ -112,12 +116,16 @@ class Player
   attr_accessor :name
 
   def initialize(name)
-    self.name = name
+    @name = name
   end
 end
 
-# Instances of the Turn class pass user turn data to the board instance.
+# Game logic - run inside a loop until quit
 
-class Turn
-  def initialize; end
+puts 'Welcom to Tic-Tac-Toe'
+
+loop do
+  puts 'Press any key to begin'
+  game = Game.new
+  game.name_players
 end
