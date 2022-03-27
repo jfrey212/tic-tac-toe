@@ -7,10 +7,8 @@ class Game
   def initialize
     @player1 = ''
     @player2 = ''
-    @is_winner = false
+    @game_over = false
     @winner = ''
-    @current_turn = 0
-    @turn_count = 1
     @board = Board.new
   end
 
@@ -25,23 +23,49 @@ class Game
     puts @player2.name
   end
 
-  def next_turn
-    system('clear')
-    puts "Turn #{@turn_count}"
-    @board.display
-    if @current_turn.zero?
-      print "\n#{@player1.name} pick a box: "
-      @board.add_x(gets.chomp.to_sym)
-      @current_turn = 1
-      @turn_count += 1
-    elsif @current_turn == 1
-      print "\n#{@player2.name} pick a box: "
-      @board.add_o(gets.chomp.to_sym)
-      @current_turn = 0
-      @turn_count += 1
+  def run_game
+    current_turn = 0
+    turn_count = 1
+    grid_choice = ""
+    loop do
+      system('clear')
+      puts "Turn #{turn_count}"
+      @board.display
+      puts
+      if current_turn.zero?
+        print "\n#{@player1.name} pick a box: "
+        grid_choice = gets.chomp
+        next unless grid_choice =~ /[abc][123]/
+        next unless @board.grid[grid_choice.to_sym] == " "
+        @board.add_x(grid_choice.to_sym)
+        current_turn = 1
+        turn_count += 1
+      elsif current_turn == 1
+        print "\n#{@player2.name} pick a box: "
+        grid_choice = gets.chomp
+        next unless grid_choice =~ /[abc][123]/
+        next unless @board.grid[grid_choice.to_sym] == " "
+        @board.add_o(grid_choice.to_sym)
+        current_turn = 0
+        turn_count += 1
+      end
+      system('clear')
+      @board.display
+      victory_check
+      if @game_over == true
+        break
+      elsif turn_count == 9
+        break
+      end
     end
     system('clear')
     @board.display
+    puts
+    if turn_count == 9
+      puts 'Tie game'
+    else
+      puts "The winner is #{@winner}"
+    end
   end
 
   def victory_check
@@ -58,20 +82,15 @@ class Game
 
     wins.each do |check|
       if check.uniq.length == 1 && check.uniq[0] == 'X'
-        @is_winner = true
-        @winner = 'player 1'
+        @game_over = true
+        @winner = @player1.name
         break
       elsif check.uniq.length == 1 && check.uniq[0] == 'O'
-        @is_winner = true
-        @winner = 'player 2'
+        @game_over = true
+        @winner = @player2.name
         break
-      else
-        @winner = 'no winner yet'
       end
     end
-
-    puts @is_winner
-    puts @winner
   end
 end
 
@@ -125,7 +144,14 @@ end
 puts 'Welcom to Tic-Tac-Toe'
 
 loop do
-  puts 'Press any key to begin'
-  game = Game.new
-  game.name_players
+  current_game = Game.new
+  current_game.name_players
+  current_game.run_game
+  puts 'Play again? (y/n)'
+  answer = gets.chomp
+  if answer == 'y'
+    next
+  else
+    break
+  end
 end
